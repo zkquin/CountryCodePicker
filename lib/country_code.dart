@@ -38,14 +38,14 @@ class CountryCode {
     final Map<String, String>? jsonCode = codes.firstWhereOrNull(
       (code) => code['code'] == countryCode,
     );
-    return CountryCode.fromJson(jsonCode);
+    return CountryCode.fromJson(jsonCode!);
   }
 
   factory CountryCode.fromDialCode(String dialCode) {
     final Map<String, String>? jsonCode = codes.firstWhereOrNull(
       (code) => code['dial_code'] == dialCode,
     );
-    return CountryCode.fromJson(jsonCode);
+    return CountryCode.fromJson(jsonCode!);
   }
 
   CountryCode localize(BuildContext context) {
