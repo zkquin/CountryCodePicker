@@ -11,6 +11,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+  String _selectedNationality;
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -149,6 +152,23 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
               SizedBox(
+                width: 400,
+                height: 60,
+                child: CountryCodePicker(
+                  text: _selectedNationality != null ? Text(_selectedNationality, style: TextStyle(fontSize: 18.0, color: Colors.black, fontWeight: FontWeight.normal),)
+                      : Text("Select", style: TextStyle(fontSize: 18.0, color: Colors.grey, fontWeight: FontWeight.normal),),
+                  onChanged: _onCountryChange,
+                  initialSelection: 'TF',
+                  showCountryOnly: true,
+                  searchDecoration: InputDecoration(hintText: 'Search...'),
+                  title: Text('Select your nationality'),
+                  showFlagMain: false,
+                  showFlag: true,
+                  showOnlyCountryWhenClosed: true,
+                  favorite: ['+39', 'FR'],
+                ),
+              ),
+              SizedBox(
                 width: 100,
                 height: 60,
                 child: CountryCodePicker(
@@ -165,5 +185,13 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  void _onCountryChange(CountryCode countryCode) {
+    //TODO : manipulate the selected country code here
+    setState(() {
+      _selectedNationality = countryCode.name.toString();
+    });
+    print("New Country selected: " + countryCode.name.toString());
   }
 }

@@ -19,7 +19,7 @@ class CountryCodePicker extends StatefulWidget {
   final TextStyle? textStyle;
   final EdgeInsetsGeometry padding;
   final bool showCountryOnly;
-  final InputDecoration searchDecoration;
+  final InputDecoration? searchDecoration;
   final TextStyle? searchStyle;
   final TextStyle? dialogTextStyle;
   final WidgetBuilder? emptySearchBuilder;
@@ -27,6 +27,16 @@ class CountryCodePicker extends StatefulWidget {
   final bool enabled;
   final TextOverflow textOverflow;
   final Icon closeIcon;
+  final Text? text;
+
+  /// The (optional) title of the dialog is displayed in a large font at the top
+  /// of the dialog.
+  ///
+  /// Typically a [Text] widget.
+  final Widget? title;
+
+  /// Padding around the title.
+  final EdgeInsetsGeometry? titlePadding;
 
   /// Barrier color of ModalBottomSheet
   final Color? barrierColor;
@@ -92,7 +102,7 @@ class CountryCodePicker extends StatefulWidget {
     this.textStyle,
     this.padding = const EdgeInsets.all(8.0),
     this.showCountryOnly = false,
-    this.searchDecoration = const InputDecoration(),
+    this.searchDecoration,
     this.searchStyle,
     this.dialogTextStyle,
     this.emptySearchBuilder,
@@ -118,6 +128,9 @@ class CountryCodePicker extends StatefulWidget {
     this.dialogBackgroundColor,
     this.closeIcon = const Icon(Icons.close),
     this.countryList = codes,
+    this.text,
+    this.title,
+    this.titlePadding,
     Key? key,
   }) : super(key: key);
 
@@ -195,14 +208,9 @@ class CountryCodePickerState extends State<CountryCodePicker> {
               if (!widget.hideMainText)
                 Flexible(
                   fit: widget.alignLeft ? FlexFit.tight : FlexFit.loose,
-                  child: Text(
-                    widget.showOnlyCountryWhenClosed
-                        ? selectedItem!.toCountryStringOnly()
-                        : selectedItem.toString(),
-                    style:
-                        widget.textStyle ?? Theme.of(context).textTheme.button,
-                    overflow: widget.textOverflow,
-                  ),
+                  child: widget.text ?? Text(widget.showOnlyCountryWhenClosed
+                      ? selectedItem!.toCountryStringOnly()
+                      : selectedItem.toString()),
                 ),
               if (widget.showDropDownButton)
                 Flexible(
@@ -241,9 +249,9 @@ class CountryCodePickerState extends State<CountryCodePicker> {
     if (oldWidget.initialSelection != widget.initialSelection) {
       if (widget.initialSelection != null) {
         selectedItem = elements.firstWhere(
-            (e) =>
-                (e.code!.toUpperCase() ==
-                    widget.initialSelection!.toUpperCase()) ||
+                (e) =>
+            (e.code!.toUpperCase() ==
+                widget.initialSelection!.toUpperCase()) ||
                 (e.dialCode == widget.initialSelection) ||
                 (e.name!.toUpperCase() ==
                     widget.initialSelection!.toUpperCase()),
@@ -261,9 +269,9 @@ class CountryCodePickerState extends State<CountryCodePicker> {
 
     if (widget.initialSelection != null) {
       selectedItem = elements.firstWhere(
-          (e) =>
-              (e.code!.toUpperCase() ==
-                  widget.initialSelection!.toUpperCase()) ||
+              (e) =>
+          (e.code!.toUpperCase() ==
+              widget.initialSelection!.toUpperCase()) ||
               (e.dialCode == widget.initialSelection) ||
               (e.name!.toUpperCase() == widget.initialSelection!.toUpperCase()),
           orElse: () => elements[0]);
@@ -273,11 +281,11 @@ class CountryCodePickerState extends State<CountryCodePicker> {
 
     favoriteElements = elements
         .where((e) =>
-            widget.favorite.firstWhereOrNull((f) =>
-                e.code!.toUpperCase() == f.toUpperCase() ||
-                e.dialCode == f ||
-                e.name!.toUpperCase() == f.toUpperCase()) !=
-            null)
+    widget.favorite.firstWhereOrNull((f) =>
+    e.code!.toUpperCase() == f.toUpperCase() ||
+        e.dialCode == f ||
+        e.name!.toUpperCase() == f.toUpperCase()) !=
+        null)
         .toList();
   }
 
@@ -310,6 +318,8 @@ class CountryCodePickerState extends State<CountryCodePicker> {
                 hideSearch: widget.hideSearch,
                 closeIcon: widget.closeIcon,
                 flagDecoration: widget.flagDecoration,
+                title: widget.title,
+                titlePadding: widget.titlePadding,
               ),
             ),
           ),
@@ -325,6 +335,8 @@ class CountryCodePickerState extends State<CountryCodePicker> {
       });
     } else {
       showMaterialModalBottomSheet(
+        enableDrag: false,
+        isDismissible: false,
         barrierColor: widget.barrierColor ?? Colors.grey.withOpacity(0.5),
         backgroundColor: widget.backgroundColor ?? Colors.transparent,
         context: context,
@@ -348,6 +360,8 @@ class CountryCodePickerState extends State<CountryCodePicker> {
             barrierColor: widget.barrierColor,
             hideSearch: widget.hideSearch,
             closeIcon: widget.closeIcon,
+            title: widget.title,
+            titlePadding: widget.titlePadding,
           ),
         ),
       ).then((e) {
