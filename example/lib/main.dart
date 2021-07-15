@@ -1,197 +1,85 @@
-import 'package:country_code_picker/country_code_picker.dart';
-import 'package:country_code_picker/country_localizations.dart';
+import 'package:country_code_picker/countries.dart';
+import 'package:country_code_picker/country_code_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   @override
-  _MyAppState createState() => new _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'country_code_picker Example',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(title: 'language_picker Example'),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
 
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+
+class _MyHomePageState extends State<MyHomePage> {
   String _selectedNationality;
 
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      supportedLocales: [
-        Locale("af"),
-        Locale("am"),
-        Locale("ar"),
-        Locale("az"),
-        Locale("be"),
-        Locale("bg"),
-        Locale("bn"),
-        Locale("bs"),
-        Locale("ca"),
-        Locale("cs"),
-        Locale("da"),
-        Locale("de"),
-        Locale("el"),
-        Locale("en"),
-        Locale("es"),
-        Locale("et"),
-        Locale("fa"),
-        Locale("fi"),
-        Locale("fr"),
-        Locale("gl"),
-        Locale("ha"),
-        Locale("he"),
-        Locale("hi"),
-        Locale("hr"),
-        Locale("hu"),
-        Locale("hy"),
-        Locale("id"),
-        Locale("is"),
-        Locale("it"),
-        Locale("ja"),
-        Locale("ka"),
-        Locale("kk"),
-        Locale("km"),
-        Locale("ko"),
-        Locale("ku"),
-        Locale("ky"),
-        Locale("lt"),
-        Locale("lv"),
-        Locale("mk"),
-        Locale("ml"),
-        Locale("mn"),
-        Locale("ms"),
-        Locale("nb"),
-        Locale("nl"),
-        Locale("nn"),
-        Locale("no"),
-        Locale("pl"),
-        Locale("ps"),
-        Locale("pt"),
-        Locale("ro"),
-        Locale("ru"),
-        Locale("sd"),
-        Locale("sk"),
-        Locale("sl"),
-        Locale("so"),
-        Locale("sq"),
-        Locale("sr"),
-        Locale("sv"),
-        Locale("ta"),
-        Locale("tg"),
-        Locale("th"),
-        Locale("tk"),
-        Locale("tr"),
-        Locale("tt"),
-        Locale("uk"),
-        Locale("ug"),
-        Locale("ur"),
-        Locale("uz"),
-        Locale("vi"),
-        Locale("zh")
-      ],
-      localizationsDelegates: [
-        CountryLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
       home: new Scaffold(
         appBar: new AppBar(
-          title: const Text('CountryPicker Example'),
+          title: Text(widget.title),
         ),
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              CountryCodePicker(
-                onChanged: print,
-                // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                initialSelection: 'IT',
-                favorite: ['+39', 'FR'],
-                countryFilter: ['IT', 'FR'],
-                showFlagDialog: false,
-                comparator: (a, b) => b.name.compareTo(a.name),
-                //Get the country information relevant to the initial selection
-                onInit: (code) =>
-                    print("on init ${code.name} ${code.dialCode} ${code.name}"),
-              ),
-              CountryCodePicker(
-                onChanged: print,
-                // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                initialSelection: 'IT',
-                favorite: ['+39', 'FR'],
-                countryFilter: ['IT', 'FR'],
-                // flag can be styled with BoxDecoration's `borderRadius` and `shape` fields
-                flagDecoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(7),
-                ),
-              ),
-              SizedBox(
-                width: 400,
-                height: 60,
-                child: CountryCodePicker(
-                  onChanged: print,
-                  hideMainText: true,
-                  showFlagMain: true,
-                  showFlag: false,
-                  initialSelection: 'TF',
-                  hideSearch: true,
-                  showCountryOnly: true,
-                  showOnlyCountryWhenClosed: true,
-                  alignLeft: true,
-                ),
-              ),
-              SizedBox(
-                width: 400,
-                height: 60,
-                child: CountryCodePicker(
-                  onChanged: (e) => print(e.toLongString()),
-                  initialSelection: 'TF',
-                  showCountryOnly: true,
-                  showOnlyCountryWhenClosed: true,
-                  favorite: ['+39', 'FR'],
-                ),
-              ),
-              SizedBox(
-                width: 400,
-                height: 60,
-                child: CountryCodePicker(
-                  text: _selectedNationality != null ? Text(_selectedNationality, style: TextStyle(fontSize: 18.0, color: Colors.black, fontWeight: FontWeight.normal),)
-                      : Text("Select", style: TextStyle(fontSize: 18.0, color: Colors.grey, fontWeight: FontWeight.normal),),
-                  onChanged: _onCountryChange,
-                  initialSelection: 'TF',
-                  showCountryOnly: true,
-                  searchDecoration: InputDecoration(hintText: 'Search...'),
-                  title: Text('Select your nationality'),
-                  showFlagMain: false,
-                  showFlag: true,
-                  showOnlyCountryWhenClosed: true,
-                  favorite: ['+39', 'FR'],
-                ),
-              ),
-              SizedBox(
-                width: 100,
-                height: 60,
-                child: CountryCodePicker(
-                  enabled: false,
-                  onChanged: (c) => c.name,
-                  initialSelection: 'TF',
-                  showCountryOnly: true,
-                  showOnlyCountryWhenClosed: true,
-                  favorite: ['+39', 'FR'],
-                ),
-              ),
-            ],
+          child: TextButton(
+            onPressed: () => _openCountryPickerDialog(),
+            child: _selectedNationality == null ? Text("Select", style: TextStyle(color: Colors.grey[800]),)
+                : Text(_selectedNationality, style: TextStyle(color: Colors.grey[800]),),
           ),
         ),
       ),
     );
   }
 
-  void _onCountryChange(CountryCode countryCode) {
+  void _openCountryPickerDialog() => showDialog(
+    context: context,
+    builder: (context) => Theme(
+        data: Theme.of(context).copyWith(primaryColor: Colors.pink),
+        child: CountryPickerDialog(
+            titlePadding: EdgeInsets.all(8.0),
+            searchCursorColor: Colors.pinkAccent,
+            searchInputDecoration: InputDecoration(hintText: 'Search...'),
+            isSearchable: true,
+            title: Text('Select your country'),
+            onValuePicked: (Country country) => setState(() {
+              _selectedNationality = country.name;
+              print(country.name);
+              print(country.code);
+              print(country.flagUri);
+            }),
+            itemBuilder: _buildDialogItem)),
+  );
+
+  Widget _buildDialogItem(Country country) => Row(
+    children: <Widget>[
+      Text(country.name),
+      SizedBox(width: 8.0),
+      Flexible(child: Text("(${country.code})"))
+    ],
+  );
+
+  void _onCountryChange(Country Country) {
     //TODO : manipulate the selected country code here
     setState(() {
-      _selectedNationality = countryCode.name.toString();
+      _selectedNationality = Country.name.toString();
     });
-    print("New Country selected: " + countryCode.name.toString());
+    print("New Country selected: " + Country.name.toString());
   }
 }
