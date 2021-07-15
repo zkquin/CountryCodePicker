@@ -74,12 +74,4 @@ class _MyHomePageState extends State<MyHomePage> {
       // Flexible(child: Text("(${country.code})"))
     ],
   );
-
-  void _onCountryChange(Country Country) {
-    //TODO : manipulate the selected country code here
-    setState(() {
-      _selectedNationality = Country.name.toString();
-    });
-    print("New Country selected: " + Country.name.toString());
-  }
 }
