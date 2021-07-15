@@ -70,8 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildDialogItem(Country country) => Row(
     children: <Widget>[
       Text(country.name),
-      SizedBox(width: 8.0),
-      Flexible(child: Text("(${country.code})"))
+      // SizedBox(width: 8.0),
+      // Flexible(child: Text("(${country.code})"))
     ],
   );
 
