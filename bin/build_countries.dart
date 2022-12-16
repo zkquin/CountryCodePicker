@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:recase/recase.dart';
+import 'package:diacritic/diacritic.dart';
 
 import 'package:country_code_picker/countries.dart';
 
-toGetterName(String countryName) => countryName
-    // Remove commas and parentheses
-    .replaceAll(RegExp('[,\(\)]'), '')
-    // Replace punctuated name
-    .replaceAll('ü', 'u')
-    .camelCase;
+toGetterName(String countryName) => removeDiacritics(
+    countryName
+    .replaceAll(RegExp("[,\(\)'’‘`]"), '') // Remove commas and parentheses
+    .camelCase);
 
 /// Reads countries.json and generates lib/countries.g.dart, which contains
 /// countries.countryName constants and the countries.defaultCountries list.
@@ -21,16 +21,16 @@ main() {
       .toList();
   final getters = countries.map((l) {
     final getterName = toGetterName(l.name);
-    return "  static Country get $getterName => Country('${l.code}', '${l.name}', '${l.dialCode}', '${l.flagUri}');";
+    return '  static Country get $getterName => Country("${l.code}", "${l.name}", "${l.dialCode}", "${l.flagUri}");';
   });
 
   final defaultCountries = '''
-static List<Country> defaultCountries =
-  [${countries.map((l) => 'Countries.' + toGetterName(l.name)).join(',\n')}];
-''';
+  static List<Country> defaultCountries = [
+    ${countries.map((l) => 'Countries.' + toGetterName(l.name)).join(',\n')}];
+  ''';
 
   final staticClass = '''
-// This is a generated file. See DEVELOPMENT_NOTES.md.
+// This is a generated file.
 import 'countries.dart';
 
 class Countries {

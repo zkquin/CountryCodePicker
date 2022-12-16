@@ -2,7 +2,12 @@ import 'countries.g.dart';
 export 'countries.g.dart';
 
 class Country {
-  Country(this.code, this.name, this.dialCode, this.flagUri);
+  Country(
+    this.code,
+    this.name,
+    this.dialCode,
+    this.flagUri
+  );
 
   final String name;
   final String code;

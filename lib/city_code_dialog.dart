@@ -1,16 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:country_code_picker/utils/my_alert_dialog.dart';
 import 'package:country_code_picker/utils/typedefs.dart';
 
-import 'countries.dart';
+import 'cities.dart';
 
-/// Provides a customizable [Dialog] which displays all countries
+// TODO: This implementation is locking UI.
+/// Provides a customizable [Dialog] which displays all cities
 /// with optional search feature
-
-class CountryPickerDialog extends StatefulWidget {
-  /// Callback that is called with selected Language
-  final ValueChanged<Country>? onValuePicked;
+class CityPickerDialog extends StatefulWidget {
+  /// Callback that is called with selected City
+  final ValueChanged<City>? onValuePicked;
 
   /// The (optional) title of the dialog is displayed in a large font at the top
   /// of the dialog.
@@ -31,7 +32,6 @@ class CountryPickerDialog extends StatefulWidget {
   final EdgeInsetsGeometry? titlePadding;
 
   /// Padding around the content.
-
   final EdgeInsetsGeometry contentPadding;
 
   /// The semantic label of the dialog used by accessibility frameworks to
@@ -47,9 +47,9 @@ class CountryPickerDialog extends StatefulWidget {
   ///    value is used.
   final String? semanticLabel;
 
-  ///Callback that is called with selected item of type Language which returns a
-  ///Widget to build list view item inside dialog
-  final CountryItemBuilder? itemBuilder;
+  /// Callback that is called with selected item of type City which returns a
+  /// Widget to build list view item inside dialog
+  final CityItemBuilder? itemBuilder;
 
   /// The (optional) horizontal separator used between title, content and
   /// actions.
@@ -74,11 +74,12 @@ class CountryPickerDialog extends StatefulWidget {
   ///The search empty view is displayed if nothing returns from search result
   final Widget? searchEmptyView;
 
-  /// List of countries available in this picker.
-  final List<Country>? countries;
+  /// Country ISO filter.
+  final String code;
 
-  CountryPickerDialog({
+  CityPickerDialog({
     Key? key,
+    required this.code,
     this.onValuePicked,
     this.title,
     this.titlePadding,
@@ -86,14 +87,11 @@ class CountryPickerDialog extends StatefulWidget {
     this.semanticLabel,
     this.itemBuilder,
     this.isDividerEnabled = false,
-    this.divider = const Divider(
-      height: 0.0,
-    ),
+    this.divider = const Divider(height: 0.0),
     this.isSearchable = false,
     this.searchInputDecoration,
     this.searchCursorColor,
     this.searchEmptyView,
-    this.countries,
   }) : super(key: key);
 
   @override
@@ -102,16 +100,16 @@ class CountryPickerDialog extends StatefulWidget {
   }
 }
 
-class SingleChoiceDialogState extends State<CountryPickerDialog> {
-  late List<Country> _allCountries;
-  late List<Country> _filteredCountries;
+class SingleChoiceDialogState extends State<CityPickerDialog> {
+  String searchField = "";
 
-  @override
-  void initState() {
-    _allCountries = widget.countries ?? Countries.defaultCountries;
-    _filteredCountries = _allCountries;
-    super.initState();
-  }
+  static Future<List<City>> parseData(Map<String, dynamic> map) async {
+    if (map["search_field"] != null) {
+      return Cities.defaultCities.where((element) => element.country == map["iso_code"]
+          && element.name.toLowerCase().startsWith(map["search_field"].toLowerCase())).toList();
+    }
+    return Cities.defaultCities.where((element) => element.country == map["iso_code"]).toList();
+ }
 
   @override
   Widget build(BuildContext context) {
@@ -126,25 +124,33 @@ class SingleChoiceDialogState extends State<CountryPickerDialog> {
   }
 
   _buildContent(BuildContext context) {
-    return _filteredCountries.isNotEmpty
-        ? ListView(
-            shrinkWrap: true,
-            children: _filteredCountries
-                .map((item) => SimpleDialogOption(
-                      child: widget.itemBuilder != null
-                          ? widget.itemBuilder!(item)
-                          : Text(item.name),
-                      onPressed: () {
-                        widget.onValuePicked!(item);
-                        Navigator.pop(context);
-                      },
-                    ))
-                .toList(),
-          )
-        : widget.searchEmptyView ??
-            Center(
-              child: Text('No country found.'),
+    return FutureBuilder(
+      future: compute(parseData, {'iso_code': widget.code, 'search_field': searchField}),
+      builder: (context, AsyncSnapshot<List<City>> snapshot) {
+        if (snapshot.hasData) {
+          if ((snapshot.data?.isNotEmpty) ?? false) {
+            return ListView.builder(
+              itemCount: snapshot.data?.length ?? 0,
+              itemBuilder: (context, index) {
+                return SimpleDialogOption(
+                  child: widget.itemBuilder != null
+                      ? widget.itemBuilder!(snapshot.data![index])
+                      : Text(snapshot.data![index].name),
+                  onPressed: () {
+                    widget.onValuePicked!(snapshot.data![index]);
+                    Navigator.pop(context);
+                  },
+                );
+              },
+              shrinkWrap: true,
             );
+          }
+          return widget.searchEmptyView ?? Center(child: Text('No city found.'));
+        }
+        print(snapshot);
+        return Center(child: CircularProgressIndicator());
+      },
+    );
   }
 
   _buildHeader() {
@@ -170,17 +176,10 @@ class SingleChoiceDialogState extends State<CountryPickerDialog> {
   _buildSearchField() {
     return TextField(
       cursorColor: widget.searchCursorColor,
-      decoration:
-          widget.searchInputDecoration ?? InputDecoration(hintText: 'Search'),
+      decoration: widget.searchInputDecoration ?? InputDecoration(hintText: 'Search'),
       onChanged: (String value) {
         setState(() {
-          _filteredCountries = _allCountries
-              .where((Country country) =>
-                country.name.toLowerCase().startsWith(value.toLowerCase()) ||
-                country.code
-                      .toLowerCase()
-                      .startsWith(value.toLowerCase()))
-              .toList();
+          searchField = value;
         });
       },
     );
