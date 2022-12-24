@@ -102,14 +102,13 @@ class CityPickerDialog extends StatefulWidget {
 
 class SingleChoiceDialogState extends State<CityPickerDialog> {
   String searchField = "";
+  List<City> _cityList = [];
 
-  static Future<List<City>> parseData(Map<String, dynamic> map) async {
-    if (map["search_field"] != null) {
-      return Cities.defaultCities.where((element) => element.country == map["iso_code"]
-          && element.name.toLowerCase().startsWith(map["search_field"].toLowerCase())).toList();
-    }
-    return Cities.defaultCities.where((element) => element.country == map["iso_code"]).toList();
- }
+  @override
+  void initState() {
+    _cityList.addAll(buildCityList());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,33 +123,33 @@ class SingleChoiceDialogState extends State<CityPickerDialog> {
   }
 
   _buildContent(BuildContext context) {
-    return FutureBuilder(
-      future: compute(parseData, {'iso_code': widget.code, 'search_field': searchField}),
-      builder: (context, AsyncSnapshot<List<City>> snapshot) {
-        if (snapshot.hasData) {
-          if ((snapshot.data?.isNotEmpty) ?? false) {
-            return ListView.builder(
-              itemCount: snapshot.data?.length ?? 0,
-              itemBuilder: (context, index) {
-                return SimpleDialogOption(
-                  child: widget.itemBuilder != null
-                      ? widget.itemBuilder!(snapshot.data![index])
-                      : Text(snapshot.data![index].name),
-                  onPressed: () {
-                    widget.onValuePicked!(snapshot.data![index]);
-                    Navigator.pop(context);
-                  },
-                );
-              },
-              shrinkWrap: true,
-            );
-          }
-          return widget.searchEmptyView ?? Center(child: Text('No city found.'));
-        }
-        print(snapshot);
-        return Center(child: CircularProgressIndicator());
-      },
-    );
+    if (_cityList.isNotEmpty) {
+      return ListView.builder(
+        itemCount: _cityList.length,
+        itemBuilder: (context, index) {
+          return SimpleDialogOption(
+            child: widget.itemBuilder != null
+                ? widget.itemBuilder!(_cityList[index])
+                : Text(_cityList[index].name),
+            onPressed: () {
+              widget.onValuePicked!(_cityList[index]);
+              Navigator.pop(context);
+            },
+          );
+        },
+        shrinkWrap: true,
+      );
+    }
+    return widget.searchEmptyView ?? Center(child: Text('No city found.'));
+  }
+
+  List<City> buildCityList() {
+    var _cityCountryReflector = new CityCountryReflector();
+
+    if (searchField.isNotEmpty) {
+      return _cityCountryReflector[widget.code].where((element) => element.name.toLowerCase().startsWith(searchField.toLowerCase())).toList();
+    }
+    return _cityCountryReflector[widget.code].toList();
   }
 
   _buildHeader() {
@@ -180,6 +179,7 @@ class SingleChoiceDialogState extends State<CityPickerDialog> {
       onChanged: (String value) {
         setState(() {
           searchField = value;
+          _cityList = buildCityList();
         });
       },
     );

@@ -1,5 +1,5 @@
-import 'cities.g.dart';
-export 'cities.g.dart';
+import 'generated_cities/cities.g.dart';
+export 'generated_cities/cities.g.dart';
 
 class City {
   City(
@@ -24,8 +24,10 @@ class City {
         lng = map['lng']!;
 
   /// Returns the City matching a geo-name ID code from the standard list.
-  factory City.fromID(String geonameid) =>
-      Cities.defaultCities.firstWhere((l) => l.geonameid == geonameid);
+  factory City.fromID(String geonameId) {
+    var _cityCountryReflector = new CityCountryReflector();
+    return _cityCountryReflector[geonameId].firstWhere((l) => l.geonameid == geonameId);
+  }
 
   bool operator ==(o) =>
       o is City && geonameid == o.geonameid && country == o.country && name == o.name
