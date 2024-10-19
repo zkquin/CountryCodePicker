@@ -7,7 +7,6 @@ import 'countries.dart';
 
 /// Provides a customizable [Dialog] which displays all countries
 /// with optional search feature
-
 class CountryPickerDialog extends StatefulWidget {
   /// Callback that is called with selected Language
   final ValueChanged<Country>? onValuePicked;

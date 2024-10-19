@@ -6,7 +6,6 @@ import 'package:country_code_picker/utils/typedefs.dart';
 
 import 'cities.dart';
 
-// TODO: This implementation is locking UI.
 /// Provides a customizable [Dialog] which displays all cities
 /// with optional search feature
 class CityPickerDialog extends StatefulWidget {

@@ -15,9 +15,11 @@ class MyAlertDialog<T> extends StatelessWidget {
     this.titlePadding,
     this.content,
     this.contentPadding = const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 24.0),
-    // this.actions,
+    this.actions,
     this.semanticLabel,
-    this.divider = const Divider(height: 0.0),
+    this.divider = const Divider(
+      height: 0.0,
+    ),
     this.isDividerEnabled = true,
   }) : super(key: key);
 
@@ -55,18 +57,18 @@ class MyAlertDialog<T> extends StatelessWidget {
   /// to separate the content from the other edges of the dialog.
   final EdgeInsetsGeometry contentPadding;
 
-  // /// The (optional) set of actions that are displayed at the bottom of the
-  // /// dialog.
-  // ///
-  // /// Typically this is a list of [TextButton] widgets.
-  // ///
-  // /// These widgets will be wrapped in a [ButtonBar], which introduces 8 pixels
-  // /// of padding on each side.
-  // ///
-  // /// If the [title] is not null but the [content] _is_ null, then an extra 20
-  // /// pixels of padding is added above the [ButtonBar] to separate the [title]
-  // /// from the [actions].
-  // final List<Widget>? actions;
+  /// The (optional) set of actions that are displayed at the bottom of the
+  /// dialog.
+  ///
+  /// Typically this is a list of [TextButton] widgets.
+  ///
+  /// These widgets will be wrapped in a [OverflowBar], which introduces 8 pixels
+  /// of padding on each side.
+  ///
+  /// If the [title] is not null but the [content] _is_ null, then an extra 20
+  /// pixels of padding is added above the [OverflowBar] to separate the [title]
+  /// from the [actions].
+  final List<Widget>? actions;
 
   /// The semantic label of the dialog used by accessibility frameworks to
   /// announce screen transitions when the dialog is opened and closed.
@@ -102,7 +104,7 @@ class MyAlertDialog<T> extends StatelessWidget {
             new EdgeInsets.fromLTRB(
                 24.0, 24.0, 24.0, isDividerEnabled ? 20.0 : 0.0),
         child: new DefaultTextStyle(
-          style: Theme.of(context).textTheme.headlineLarge!,
+          style: Theme.of(context).textTheme.titleLarge!,
           child: new Semantics(child: title, namesRoute: true),
         ),
       ));
@@ -128,21 +130,21 @@ class MyAlertDialog<T> extends StatelessWidget {
         child: new Padding(
           padding: contentPadding,
           child: new DefaultTextStyle(
-            style: Theme.of(context).textTheme.bodySmall!,
+            style: Theme.of(context).textTheme.titleMedium!,
             child: content!,
           ),
         ),
       ));
     }
-    //
-    // if (actions != null) {
-    //   if (isDividerEnabled) children.add(divider);
-    //   children.add(
-    //     new ButtonBar(
-    //       children: actions!,
-    //     ),
-    //   );
-    // }
+
+    if (actions != null) {
+      if (isDividerEnabled) children.add(divider);
+      children.add(
+        new OverflowBar(
+          children: actions!,
+        ),
+      );
+    }
 
     Widget dialogChild = new Column(
       mainAxisSize: MainAxisSize.min,
